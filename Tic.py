@@ -1,6 +1,7 @@
 import math
 from copy import deepcopy
-from pprint import pprint
+
+from utils import checkdraw, winningPos
 winCombos = [
                             [0, 1, 2],
                             [3, 4, 5],
@@ -36,30 +37,28 @@ def evaluate(player:int,board):
                     o2+=1
                 elif ones ==1 and zeros ==2:
                     o1+=1
+        return ((3*o2) +o1) -((3*x2)+x1)
 
-        return ((3*x2) +x1) -((3*o2)+o1)
 
-
-def minimax(position:"Tic",depth:"int",maximizingPlayer:bool ):
-    if depth == 0 or position.winningPos() or position.checkdraw():
-        return evaluate(2 if maximizingPlayer else 1,position.board)
+def minimax(position,depth:"int",maximizingPlayer:bool ):
+    if depth == 0 or winningPos(position) or checkdraw(position):
+        return evaluate(2 if maximizingPlayer else 1,position)
     
     if maximizingPlayer:
         maxEval = -1000000
-        for child in children(position.board):
+        for child in children(position):
             eval = minimax(child,depth-1,False)
-            print(eval)
             maxEval = max(eval,maxEval)
         return maxEval
     else:
         minEval = 1000000
-        for child in children(position.board):
+        for child in children(position):
             eval = minimax(child, depth-1,True)
 
             minEval = min(minEval,eval)
         return minEval
 
-def children(position:"list[list[int]]"):
+def children(position:"list[list[int]]")->"list[list[list[int]]]":
     main = []
     other = deepcopy(position)
     for ind,row in enumerate(position):
@@ -67,7 +66,7 @@ def children(position:"list[list[int]]"):
             ls = deepcopy(other)
 
             if col == 0:
-                ls[ind][inder] = 1
+                ls[ind][inder] = 2
 
                 main.append(ls)
 
@@ -99,7 +98,7 @@ class Tic:
                             [0, 4, 8],
                             [6, 4, 2]
                             ]
-                                
+       
     def winningPos(self):
         tri:list[int] = []
 
@@ -118,6 +117,9 @@ class Tic:
             num =0
             tri.clear()
         return False
+    
+
+
         
     def makeMove(self,one, two):
         if one < 3 and two< 3:
@@ -166,17 +168,16 @@ class Tic:
         get = children(self.board)
         les = []
         for tic in get:
-            eval = minimax(position=tic,depth=4,maximizingPlayer=True)
+            eval = minimax(position=tic,depth=10,maximizingPlayer=True)
             les.append(eval)
-        index = 0
-        m = -math.inf
-        for i in range(len(les)):
-            if les[i] >m:
-                m = les[i]
-                index= i 
-        print(les[0])
-        self.board = get
+        
+        res = les.index(max(les))
+        self.board = get[res]
+        self.current_player = 1 if self.current_player == 2 else 2
+        if self.winningPos():
+            return 1
         return 0
+
                 
 
                 

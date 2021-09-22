@@ -2,6 +2,7 @@ import math
 from Tic import Tic
 
 running = True
+winner = 0
 game = Tic()
 result = 0
 while running:
@@ -16,10 +17,14 @@ while running:
     print(game)
     if res > 0:
         result = res
+        winner = 1 if res == 1 else 0
         running = False
     elif res<0:
         print("Invalid index try again" if res == -1 else "Position taken try again")
 
 
-# print(result)
+if result == 1:
+    print(f"The winner was {str(winner)}")
+else:
+    print("tie")
 
